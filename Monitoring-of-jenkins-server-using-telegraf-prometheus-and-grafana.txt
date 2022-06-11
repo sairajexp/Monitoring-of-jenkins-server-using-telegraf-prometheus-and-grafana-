@@ -1,0 +1,62 @@
+# Monitoring-of-jenkins-server-using-telegraf-prometheus-and-grafana
+-Install telegraf and Jenkins in instance-A and install prometheus and grafana in instance-B
+-Here we are using separate instance one for jenkins server and Prometheus 
+we can use only one instance for both jenkins and prometheus
+
+-In the telegraf.conf we have configure output plugins and input plugins for Jenkins server monitoring 
+-install telegraf 
+-Cd /etc/telegraf
+-telegraf.conf telegraf.d (you’ll see two files)
+-vi telegraf.conf (edit the input and output plugins in telegraf.conf)
+-Input plugins:
+-# Read jobs and metrics from Jenkins instances
+-[[inputs.jenkins]]
+  ## The Jenkins URL in the format "schema://host:port"
+  url = "http://my-jenkins-instance:8080"
+  # username = "admin"
+  # password = "admin”
+
+-Uncomment the URL and username and password(remove # which means uncomment) Add URL, username and password
+-URL = “http://IP address of jenkins:8080” {if you have installed telegraf and Jenkins instance (server)}
+
+-And you should enter Jenkins “username” and¬¬ “password”  in the input plugins of telegraf.conf
+-If you miss entering username and password you will json/api error
+-Output plugins:
+# Configuration for the Prometheus client to spawn in 
+[[outputs.prometheus_client]]
+  ## Address to listen on.
+  listen = ":9273"
+
+-Here we have to port number (any port) but it should not in use 
+-Ex : don’t  assign port number 8080 or 9090 etc, These  are already  assign to Jenkins and Prometheus
+-telegraf --config telegraf.conf (use this command for save the edited configurations)
+-it gives the output and telegraf is giving out metrics on port number “9273” 
+
+-In the browser IPaddress of Jenkins-server:9273
+-You’ll see metrics and with respective port number 
+ -2022-05-14T12:52:33Z I! [outputs.prometheus_client] Listening on http://[::]:9273/metrics
+-In the browser IP address of Jenkins -server:9273
+-http://IPaddress:9273/metrics  then you’ll see metrics of Jenkins which are scraped by telegraf 
+
+SETUP PROMETHEUS SERVER:
+Install prometheus in new server
+In the prometheus directory edit targets in prometheus.yml (it is config file of Prometheus where you need to add targets)
+Under targets 
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+- job_name: "prometheus"
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+    static_configs:
+      - targets: ["localhost:9090"]
+- job_name: "Jenkins"
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+    static_configs:
+      - targets: ["IP address of jenkins server:9273"]
+
+
+
+
+
+ 
