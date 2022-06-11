@@ -54,9 +54,5 @@ scrape_configs:
     # scheme defaults to 'http'.
     static_configs:
       - targets: ["IP address of jenkins server:9273"]
-
-
-
-
-
+      you can assign any other port number 
  
